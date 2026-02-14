@@ -130,7 +130,7 @@ return str(status).strip().lower() if status else ""
 
 ### Update Import Path
 
-Edit `order_placement_optimized.py` line 61:
+Edit `order_placement_optimized.py` (lines 86-89 for standard function, lines 176-179 for ultra-fast variant):
 
 ```python
 # Change this line:

@@ -82,7 +82,9 @@ def place_anchor_fast_one_leg_fok(
     anchor_token_id = up_token_id if side == "UP" else down_token_id
     px = float(price)
 
-    # Import client here to avoid circular imports and initialization overhead
+    # TODO: Update import to match your actual module structure
+    # Example: from trading.client import get_client, OrderArgs, PostOrdersArgs, OrderType, BUY
+    #          from trading.logging import logger
     from your_module import get_client, OrderArgs, PostOrdersArgs, OrderType, BUY, logger
     
     client = get_client()
@@ -103,7 +105,7 @@ def place_anchor_fast_one_leg_fok(
         results = client.post_orders([PostOrdersArgs(order=signed_order, orderType=OrderType.FOK)])
         
         # Debug logging (keep for troubleshooting)
-        logger.info(f"Debuging Results OpenOrder : {results}")
+        logger.info(f"Debugging Results OpenOrder : {results}")
 
         # Fast path: handle list or single result
         r = results[0] if isinstance(results, list) and results else results if results else None
@@ -173,6 +175,9 @@ def place_anchor_fast_one_leg_fok_ultra(
     
     Returns: (ok: bool, fill_price: float, order_ids: list[str|None])
     """
+    # TODO: Update import to match your actual module structure
+    # Example: from trading.client import get_client, OrderArgs, PostOrdersArgs, OrderType, BUY
+    #          from trading.logging import logger
     from your_module import get_client, OrderArgs, PostOrdersArgs, OrderType, BUY, logger
     
     side = str(anchor_side).upper()
