@@ -1,0 +1,109 @@
+
+======================================================================
+STOP-LOSS CALCULATION TEST SUITE
+Testing Original vs Fixed Implementation
+======================================================================
+======================================================================
+ORIGINAL CALCULATION (BUGGY)
+======================================================================
+
+Test 1: UP position
+  Entry Price: 0.48
+  Current Exit Price: 0.4
+  Drawdown: 16.67%
+  Expected: ~16.67% loss
+  Result: ✓ CORRECT
+
+Test 2: DOWN position
+  Entry Price: 0.52
+  Current Exit Price: 0.6
+  Drawdown: -15.38%
+  Expected: ~15.38% loss (positive)
+  Result: ✗ WRONG - NEGATIVE VALUE!
+
+Test 3: DOWN position - Stop Loss Check
+  Entry Price: 0.5
+  Current Exit Price: 0.6
+  Drawdown: -20.00%
+  Stop Loss Threshold: 10.0%
+  Should Trigger: YES (20% loss)
+  Actually Triggers: NO ✗ BUG!
+
+
+======================================================================
+FIXED CALCULATION
+======================================================================
+
+Test 1: UP position
+  Entry Price: 0.48
+  Current Exit Price: 0.4
+  Drawdown: 16.67%
+  Expected: ~16.67% loss
+  Result: ✓ CORRECT
+
+Test 2: DOWN position
+  Entry Price: 0.52
+  Current Exit Price: 0.6
+  Drawdown: 15.38%
+  Expected: ~15.38% loss (positive)
+  Result: ✓ CORRECT
+
+Test 3: DOWN position - Stop Loss Check
+  Entry Price: 0.5
+  Current Exit Price: 0.6
+  Drawdown: 20.00%
+  Stop Loss Threshold: 10.0%
+  Should Trigger: YES (20% loss)
+  Actually Triggers: YES ✓ FIXED!
+
+
+======================================================================
+TAKE-PROFIT CALCULATION (Already Correct)
+======================================================================
+
+Test 1: Profitable scenario
+  Entry Price: 0.48
+  Hedge Price: 0.49
+  Total Cost: 0.97
+  Guaranteed Payout: 1.0
+  Profit: 3.09%
+  Calculation: (1.0 - 0.97) / 0.97 * 100 = 3.09%
+
+Test 2: Break-even scenario
+  Entry Price: 0.5
+  Hedge Price: 0.5
+  Total Cost: 1.0
+  Guaranteed Payout: 1.0
+  Profit: 0.00%
+
+Test 3: Loss scenario
+  Entry Price: 0.52
+  Hedge Price: 0.51
+  Total Cost: 1.03
+  Guaranteed Payout: 1.0
+  Profit: -2.91% (negative = loss)
+
+
+======================================================================
+SUMMARY
+======================================================================
+
+The CRITICAL BUG is in the stop-loss calculation for DOWN positions:
+
+ORIGINAL CODE (BUGGY):
+  dd_pct = (entry_price - float(cur_exit)) / float(entry_price) * 100.0
+
+This formula only works for UP positions. For DOWN positions, when the 
+price increases (you lose money), the result is NEGATIVE, so the stop-loss
+never triggers!
+
+FIXED CODE:
+  if entry_side == 'UP':
+      dd_pct = (entry_price - float(cur_exit)) / float(entry_price) * 100.0
+  else:  # entry_side == 'DOWN'
+      dd_pct = (float(cur_exit) - entry_price) / float(entry_price) * 100.0
+
+This correctly handles both position types.
+
+TAKE-PROFIT CALCULATION: Already correct, no changes needed.
+    
